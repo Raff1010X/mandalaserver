@@ -11,7 +11,7 @@ exports.getById = async (req, res, next) => {
 
     if (Number(fileName) > Number(numberOfFiles)) fileName = 1;
 
-    if (Number(fileName) === -1 ) fileName = numberOfFiles;
+    if (Number(fileName) <= 0 ) fileName = numberOfFiles;
 
     const file = await fs.readFile(
         `${__dirname}/../data/${fileName}.json`,
