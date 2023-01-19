@@ -37,6 +37,14 @@ exports.getById = async (req, res, next) => {
 exports.create = async (req, res, next) => {
     const numberOfFiles = await getNumFiles(`${__dirname}/../data/`);
     const fileName = Number(1 + numberOfFiles);
+
+    if (!req.body.mandalaArr) {
+        res.status(200).json({
+            status: 'error',
+        });
+        return;
+    }
+
     const jsonContent = JSON.stringify({ fileName, body: req.body });
 
     fs.writeFile(
