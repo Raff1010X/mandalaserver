@@ -1,17 +1,25 @@
 const { promises: fs } = require('fs');
+const fsn = require('fs');
 
-const getNumFiles = async (dir) => {
-    const files = await fs.readdir(dir);
+
+const getNumFilesSynchroniusly = (dir) => {
+    const files = fsn.readdirSync(dir);
     return files.length;
 };
 
+// const getNumFiles = async (dir) => {
+//     const files = await fs.readdir(dir);
+//     return files.length;
+// };
+
 exports.getById = async (req, res, next) => {
     let fileName = req.params._id;
-    let numberOfFiles = await getNumFiles(`${__dirname}/../data/`);
+    // let numberOfFiles = await getNumFiles(`${__dirname}/../data/`);
+    let numberOfFiles = getNumFilesSynchroniusly(`${__dirname}/../data/`);
 
     if (Number(fileName) > Number(numberOfFiles)) fileName = 1;
 
-    if (Number(fileName) <= 0 ) fileName = numberOfFiles;
+    if (Number(fileName) <= 0) fileName = numberOfFiles;
 
     const file = await fs.readFile(
         `${__dirname}/../data/${fileName}.json`,
@@ -26,7 +34,6 @@ exports.getById = async (req, res, next) => {
             }
         }
     );
-    
 
     res.status(200).json({
         status: 'ok',
@@ -35,15 +42,15 @@ exports.getById = async (req, res, next) => {
 };
 
 exports.create = async (req, res, next) => {
-    const numberOfFiles = await getNumFiles(`${__dirname}/../data/`);
-    const fileName = Number(1 + numberOfFiles);
-
     if (!req.body.mandalaArr) {
         res.status(200).json({
             status: 'error',
         });
         return;
     }
+    // const numberOfFiles = await getNumFiles(`${__dirname}/../data/`);
+    const numberOfFiles = getNumFilesSynchroniusly(`${__dirname}/../data/`);
+    const fileName = Number(1 + numberOfFiles);
 
     const jsonContent = JSON.stringify({ fileName, body: req.body });
 
@@ -60,9 +67,9 @@ exports.create = async (req, res, next) => {
                 return;
             }
         }
-    );
-
-    res.status(201).json({
-        status: 'ok',
+    ).then(() => {
+        res.status(201).json({
+            status: 'ok',
+        });
     });
 };
