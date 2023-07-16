@@ -7,14 +7,8 @@ const getNumFilesSynchroniusly = (dir) => {
     return files.length;
 };
 
-// const getNumFiles = async (dir) => {
-//     const files = await fs.readdir(dir);
-//     return files.length;
-// };
-
 exports.getById = async (req, res, next) => {
     let fileName = req.params._id;
-    // let numberOfFiles = await getNumFiles(`${__dirname}/../data/`);
     let numberOfFiles = getNumFilesSynchroniusly(`${__dirname}/../data/`);
 
     if (Number(fileName) > Number(numberOfFiles)) fileName = 1;
@@ -34,11 +28,16 @@ exports.getById = async (req, res, next) => {
             }
         }
     );
-
-    res.status(200).json({
-        status: 'ok',
-        file,
-    });
+    if (file) {
+        res.status(200).json({
+            status: 'ok',
+            file,
+        });
+    } else {
+        res.status(200).json({
+            status: 'error',
+        });
+    }
 };
 
 exports.create = async (req, res, next) => {
@@ -48,7 +47,6 @@ exports.create = async (req, res, next) => {
         });
         return;
     }
-    // const numberOfFiles = await getNumFiles(`${__dirname}/../data/`);
     const numberOfFiles = getNumFilesSynchroniusly(`${__dirname}/../data/`);
     const fileName = Number(1 + numberOfFiles);
 
@@ -58,7 +56,7 @@ exports.create = async (req, res, next) => {
         `${__dirname}/../data/${fileName}.json`,
         jsonContent,
         'utf8',
-        function (err) {
+        (err) => {
             if (err) {
                 console.log('Error writing JSON: ', err);
                 res.status(200).json({
@@ -66,10 +64,18 @@ exports.create = async (req, res, next) => {
                 });
                 return;
             }
-        }
-    ).then(() => {
-        res.status(201).json({
-            status: 'ok',
+        })
+        .then(() => {
+            res.status(201).json({
+                status: 'ok',
+            })
+            return;
+        })
+        .catch((err) => {
+            console.log('Error writing JSON: ', err);
+            res.status(200).json({
+                status: 'error',
+            });
+            return;
         });
-    });
 };
