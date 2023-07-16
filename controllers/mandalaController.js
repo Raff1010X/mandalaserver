@@ -29,8 +29,10 @@ exports.getById = async (req, res, next) => {
         }
     );
     if (file) {
+        const id = JSON.parse(file).fileName;
         res.status(200).json({
             status: 'ok',
+            id,
             file,
         });
     } else {
